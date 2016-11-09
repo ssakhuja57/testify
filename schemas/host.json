@@ -1,0 +1,36 @@
+{
+"$schema": "http://json-schema.org/draft-04/schema#",
+	
+"required": ["name", "hosts"],
+
+"additionalProperties": false,
+
+"options": {
+	"disable_properties": true
+},
+
+"definitions": {
+        "host": {
+                "required": ["hostname", "port", "secure", "check-cert"],
+                "additionalProperties": false,
+                "options": {"disable_properties": true},
+                "properties": {
+                        "hostname": {"type": "string", "description": "hostname to connect to"},
+                        "port": {"type": "integer", "default": 80, "description": "port to connect to"},
+                        "secure": {"type": "boolean", "description": "whether to establish a secure connection (https)"},
+                        "check-cert": {"type": "boolean", "description": "whether to verify the ssl certificate of the host"}
+                }
+        }
+},
+
+"properties": {
+        "name": {"type": "string", "description": "name to assign to host set"},
+        "hosts": {
+                "type": "array",
+                "items": {
+                        "allOf": [{"$ref": "#/definitons/host"}]
+                }
+        }
+}
+
+}

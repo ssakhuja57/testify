@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>%(type)s editor</title>
+    <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//cdn.jsdelivr.net/foundation/5.0.2/css/foundation.min.css'>
+    <!-- Font Awesome icons (Bootstrap, Foundation, and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+    <script src="/static/jsoneditor.js"></script>
+  </head>
+  <body>
+    <h1>%(type)s editor</h1>
+    
+    <button id='save'>save changes</button>
+    <br>
+    <form>
+    Select %(type)s: %(options)s
+    <input type="submit" value="Load">
+    </form>
+    <div id='editor_holder'></div>
+    
+    <script>
+	//set defaults
+	JSONEditor.defaults.editors.object.options.collapsed = true;
+	//JSONEditor.defaults.editors.object.options.disable_properties = true;
+
+	//create editor
+	var editor = new JSONEditor(document.getElementById('editor_holder'),
+		{
+		form_name_root: 'config',
+		theme: 'foundation5',
+		iconlib: 'fontawesome4',
+		collapsed: true,
+		schema: %(schema)s,
+		startval: %(cfg)s,
+		}
+	);
+      
+
+	function save(json){
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/testify/edit/%(type)s", true);
+		xhttp.send(JSON.stringify(json, null, 4));
+		xhttp.onreadystatechange = function() {
+			if (xhttp.readyState == 4) {
+				alert(xhttp.responseText)
+			}
+		}
+	}
+
+
+	document.getElementById('save').addEventListener('click', function() {
+		console.log(JSON.stringify(editor.getValue(), null, 4))
+		save(editor.getValue())
+		});
+    </script>
+  </body>
+</html>
+

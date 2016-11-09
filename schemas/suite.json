@@ -1,0 +1,64 @@
+{
+"$schema": "http://json-schema.org/draft-04/schema#",
+	
+"required": [
+	"name", "description", "tests"
+	],
+
+"additionalProperties": false,
+
+"properties": {
+	"name": {"type": "string", "description": "name to assign to test suite"},
+	"description": {"type": "string", "description": "purpose of the test suite"},
+	"tests": {
+		"type": "array",
+		"items": {
+			"$ref": "#/definitions/test"
+		}
+	}
+},
+
+"definitions": {
+	"test": {
+		"headerTemplate": "{{self.name}}",
+		"required": ["name", "description", "enabled", "request", "response"],
+		"additionalProperties": false,
+		"options": {"disable_edit_json": true},
+		"properties": {
+			"name": {"type": "string", "description": "name of test, must be unique as it also serves as an id to reference any values saved in its response"},
+                        "host-index": {"type": "number", "default": 0, "description": "index of host in host set to run this test against, applies if you want to run different tests against different hosts"},
+			"description": {"type": "string", "description": "description of what test does"},
+                        "instances": {"type": "number", "default": 1, "description": "number of instances of this test to run, defaults to 1"},
+			"enabled": {"type": "boolean", "default": true, "description": "if not enabled, test result will be marked as skipped"},
+			"request": {
+				"required": ["uri", "method"],
+				"additionalProperties": false,
+				"defaultProperties": ["uri", "method"],
+				"options": {"disable_edit_json": true},
+				"properties": {
+					"uri": {"type": "string", "description": "uri to hit for the test"},
+					"method": {"type": "string", "description": "http method to use", "enum": ["GET", "POST", "DELETE", "PUT"]},
+					"auth": {"type": "string", "description": "authorization header to use in the request"},
+					"content-type": {"type": "string", "default": "application/json", "description": "content-type of data that's being sent, e.g. 'application/json' for json data"},
+					"data": {"type": "string", "description": "data to send in request body", "format": "textarea"}
+				}
+			},
+			"response": {
+				"required": ["expected-status"],
+				"additionalProperties": false,
+				"defaultProperties": ["expected-status"],
+				"options": {"disable_edit_json": true},
+				"properties": {
+					"expected-status": {"type": "string", "default": "200-299", "description": "http status code expected as a response to the request, can specify range like '200-299', test fails if returned status code does not meet this criteria"},
+					"expected-response-field": {"type": "string", "description": "field in the response in which to look for a value, supports xpath like search (e.g. /foo/0/bar)"},
+					"expected-response-field-value": {"type": "string", "description": "value expected for expected-response-field"},
+					"save-field": {"type": "string", "description": "field in response whose value should be saved for remainder of test suite run, the value of this can be referenced anywhere in subsequent tests with <test:name:save-field>, where 'name' is the name of the test from which the field was saved and 'save-field' is the name of the field, e.g. <test:get_token:token>"},
+                    "warning-threshold": {"type": "number", "description": "if response is not received within this amount of time (in milliseconds),  test result will be a warning"},
+                    "critical-threshold": {"type": "number", "description": "if response is not recieved within this amount of time (in milliseconds), test result will be a failure"}
+				}
+			}
+		}
+	}
+}
+
+}

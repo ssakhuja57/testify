@@ -1,0 +1,343 @@
+{
+    "name": "ts-v2",
+    "description": "end user testing for thingspace v2 api's",    
+    "tests": [
+        {
+            "name": "apptoken_get",
+            "description": "get an application token",
+            "enabled": true,
+            "request": {
+                "uri": "/oauth2/token",
+                "method": "POST",
+                "auth": "Basic xxx",
+                "data": "grant_type=client_credentials&scope=ts.account.wo ts.account",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "access_token"
+            }
+        },
+        {
+            "name": "account_create",
+            "description": "create an account",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/accounts",
+                "method": "POST",
+                "auth": "Bearer <test:apptoken_get:access_token>",
+                "data": "{\"email\":\"<general:rand_email>\",\"password\":\"sUpersEcret@5\",\"noEmailVerification\":true}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200"
+            }
+        },
+        {
+            "name": "usertoken_get",
+            "description": "get a user token",
+            "enabled": true,
+            "request": {
+                "uri": "/oauth2/token",
+                "method": "POST",
+                "auth": "Basic xxx",
+                "data": "grant_type=password&scope=ts.account ts.target ts.tag ts.trigger ts.place ts.schedule ts.device ts.user&username=<general:rand_email>&password=sUpersEcret@5",
+                "content-type": "application/x-www-form-urlencoded"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "access_token"
+            }
+        },
+        {
+            "name": "account_get",
+            "description": "get created account",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/accounts/me",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200"
+            }
+        },
+        {
+            "name": "tag_create",
+            "description": "create a tag",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/tags",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"ImageId\":\"imageid\",\"CustomDataId\":\"customdataid\",\"IconId\":\"iconid\",\"Color\":\"color\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "tag_get",
+            "description": "get created tag",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/tags",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:tag_create:id>"
+            }
+        },
+        {
+            "name": "device_create",
+            "description": "create a device",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/devices",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"kind\":\"ts.device\",\"name\":\"test-device-12\",\"tagids\": [\"<test:tag_create:id>\"],\"capability\":\"00000000-0000-0000-0000-000000000000\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "device_get",
+            "description": "get created device",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/devices",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:device_create:id>"
+            }
+        },
+        {
+            "name": "target_create",
+            "description": "create a target",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/targets",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"AddressScheme\":\"smtp\",\"Address\":\"testing@test.com\",\"kind\":\"ts.target\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "target_get",
+            "description": "get created target",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/targets",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:target_create:id>"
+            }
+        },
+        {
+            "name": "schedule_create",
+            "description": "create a schedule",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/schedules",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"StartTime\":\"2016-04-19T18:22:10.001Z\",\"EndTime\":\"2016-04-20T18:22:10.001Z\",\"Days\":[\"Monday\",\"Tuesday\"],\"ScheduleStart\":\"2016-04-19T18:22:10.001Z\",\"kind\":\"ts.schedule\",\"ScheduleStop\":\"2016-04-20T18:22:10.001Z\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "schedule_get",
+            "description": "get created schedule",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/schedules",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:schedule_create:id>"
+            }
+        },
+        {
+            "name": "trigger_create",
+            "description": "create a trigger",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/triggers",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"deviceid\": \"<test:device_create:id>\",\"tagids\": [\"<test:tag_create:id>\"],\"Condition\":\"$/fields/level eq 40\",\"kind\":\"ts.trigger\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "trigger_get",
+            "description": "get created trigger",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/triggers",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:trigger_create:id>"
+            }
+        },
+        {
+            "name": "place_create",
+            "description": "create a place",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/places",
+                "method": "POST",
+                "auth": "Bearer <test:usertoken_get:access_token>",
+                "data": "{\"Shape\":\"Circle\",\"Radius\":40,\"Address\":\"12345 blah blah\",\"Latitude\":34.1064,\"Longitude\":117.5931,\"kind\":\"ts.place\"}",
+                "content-type": "application/json"
+            },
+            "response": {
+                "expected-status": "200",
+                "save-field": "id"
+            }
+        },
+        {
+            "name": "place_get",
+            "description": "get created place",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/places",
+                "method": "GET",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "200",
+                "expected-response-field": "id",
+                "expected-response-field-value": "<test:place_create:id>"
+            }
+        },
+        {
+            "name": "target_delete",
+            "description": "delete created target",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/targets/<test:target_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "tag_delete",
+            "description": "delete created tag",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/tags/<test:tag_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "device_delete",
+            "description": "delete created device",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/devices/<test:device_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "trigger_delete",
+            "description": "delete created trigger",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/triggers/<test:trigger_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "place_delete",
+            "description": "delete created place",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/places/<test:place_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "schedule_delete",
+            "description": "delete created schedule",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/schedules/<test:schedule_create:id>",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        },
+        {
+            "name": "account_delete",
+            "description": "delete created account",
+            "enabled": true,
+            "request": {
+                "uri": "/api/v2/accounts/me",
+                "method": "DELETE",
+                "auth": "Bearer <test:usertoken_get:access_token>"
+            },
+            "response": {
+                "expected-status": "204"
+            }
+        }
+    ]
+}
