@@ -285,8 +285,8 @@ class HostSet(object):
             self.hosts.append(Host(host_cfg))
 
 class Runner(object):
-    def __init__(self, host_set, routine):
-		# dictionary to store any values returned from tasks
+    def __init__(self, routine, host_set):
+		# dictionary to store any values that need to persist across tasks
         self.runtime = Runtime()
         self.host_set = host_set
         self.routine = routine
@@ -391,6 +391,6 @@ if __name__ == '__main__':
     host_set_cfg = json.load(open(sys.argv[2]))
     routine = Routine(routine_cfg)
     host_set = HostSet(host_set_cfg)
-    res = Runner(host_set, routine).run()
+    res = Runner(routine, host_set).run()
     print json.dumps(res, indent=4)
     sys.exit(res['tasks-failed'])
